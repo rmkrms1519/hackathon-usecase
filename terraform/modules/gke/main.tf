@@ -1,0 +1,81 @@
+resource "google_container_cluster" "primary" {
+  name     = "hackathon-gke-${var.environment}"
+  location = var.region
+  project  = var.project_id
+
+  remove_default_node_pool = true
+  initial_node_count       = 1
+  network                  = var.vpc_id
+  subnetwork               = var.private_subnet_id
+
+  ip_allocation_policy {
+    cluster_secondary_range_name  = "gke-pods-${var.environment}"
+    services_secondary_range_name = "gke-services-${var.environment}"
+  }
+
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
+  }
+
+  logging_config {
+    enable_components = ["SYSTEM_COMPONENTS", "WORKLOADS"]
+  }
+
+  monitoring_config {
+    enable_components = ["SYSTEM_COMPONENTS"]
+    managed_prometheus {
+      enabled = true
+    }
+  }
+
+  network_policy {
+    enabled = true
+  }
+
+  private_cluster_config {
+    enable_private_nodes    = true
+    enable_private_endpoint = false
+    master_ipv4_cidr_block  = "172.16.0.0/28"
+  }
+
+  master_authorized_networks_config {
+    cidr_blocks {
+      cidr_block   = "0.0.0.0/0"
+      display_name = "All"
+    }
+  }
+
+  deletion_protection = false
+}
+
+resource "google_container_node_pool" "primary_nodes" {
+  name               = "hackathon-nodes-${var.environment}"
+  location           = var.region
+  cluster            = google_container_cluster.primary.name
+  initial_node_count = 1
+
+  autoscaling {
+    min_node_count = 1
+    max_node_count = 3
+  }
+
+  management {
+    auto_repair  = true
+    auto_upgrade = true
+  }
+
+  node_config {
+    preemptible     = var.environment != "prod"
+    machine_type    = var.environment == "prod" ? "e2-standard-4" : "e2-medium"
+    disk_size_gb    = 50
+    service_account = var.gke_service_account
+    oauth_scopes    = ["https://www.googleapis.com/auth/cloud-platform"]
+    labels = {
+      environment = var.environment
+    }
+    tags = ["gke-node", "hackathon-${var.environment}"]
+    workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
+  }
+}

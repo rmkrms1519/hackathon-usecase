@@ -1,4 +1,13 @@
-.DS*
-.class*
-.jar
-.ear
+terraform/.terraform/
+terraform/*.tfstate*
+terraform/*.tfplan
+terraform/.terraform.lock.hcl
+node_modules/
+.env
+order-service/target/
+*.class
+*.jar
+.vscode/
+.idea/
+.DS_Store
+*.log
