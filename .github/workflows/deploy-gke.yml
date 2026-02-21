@@ -6,13 +6,6 @@ on:
     types: [completed]
     branches: [main]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Target environment'
-        required: true
-        default: 'dev'
-        type: choice
-        options: [dev, staging, prod]
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -59,7 +52,7 @@ jobs:
         run: |
           kubectl rollout status deployment/patient-service -n healthcare --timeout=300s
           kubectl rollout status deployment/application-service -n healthcare --timeout=300s
-          kubectl rollout status deployment/order-service -n healthcare --timeout=300s
+          kubectl rollout status deployment/order-service -n healthcare --timeout=600s
       - name: Verify
         run: |
           echo "=== Deployments ==="

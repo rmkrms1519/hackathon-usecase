@@ -6,7 +6,7 @@ metadata:
   labels:
     app: patient-service
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: patient-service
@@ -23,8 +23,6 @@ spec:
           env:
             - name: PORT
               value: "3000"
-            - name: NODE_ENV
-              value: "production"
           resources:
             requests:
               cpu: "100m"
