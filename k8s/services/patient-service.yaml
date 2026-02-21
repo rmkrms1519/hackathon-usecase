@@ -4,7 +4,7 @@ metadata:
   name: patient-service
   namespace: healthcare
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: patient-service
   ports:
