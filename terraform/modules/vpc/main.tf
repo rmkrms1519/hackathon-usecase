@@ -27,11 +27,11 @@ resource "google_compute_subnetwork" "private_subnet" {
 
   secondary_ip_range {
     range_name    = "gke-pods-${var.environment}"
-    ip_cidr_range = cidrsubnet(var.vpc_cidr, 4, 1)
+    ip_cidr_range = "10.4.0.0/14"
   }
   secondary_ip_range {
     range_name    = "gke-services-${var.environment}"
-    ip_cidr_range = cidrsubnet(var.vpc_cidr, 8, 20)
+    ip_cidr_range = "10.8.0.0/20"
   }
 }
 
